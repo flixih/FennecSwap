@@ -1,18 +1,11 @@
 #pragma once
 #include "bakkesmod/plugin/bakkesmodplugin.h"
-#include "bakkesmod/plugin/pluginsettingswindow.h"
 
-class FennecSwap : public BakkesMod::Plugin::BakkesModPlugin,
-                   public BakkesMod::Plugin::PluginSettingsWindow
+class FennecSwap : public BakkesMod::Plugin::BakkesModPlugin
 {
 public:
     void onLoad() override;
     void onUnload() override;
-
-    // Settings window
-    void RenderSettings() override;
-    std::string GetPluginName() override;
-    void SetImGuiContext(uintptr_t ctx) override;
 
 private:
     void HookEvents();
