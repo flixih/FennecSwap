@@ -3,14 +3,11 @@
 #include <Windows.h>
 #include "bakkesmod/plugin/bakkesmodplugin.h"
 #include "bakkesmod/plugin/pluginsettingswindow.h"
-#include "bakkesmod/plugin/PluginSettingsWindow.h"
 #include "bakkesmod/wrappers/includes.h"
-#include "bakkesmod/vendor/imgui/imgui.h"
 #include <memory>
 #include <string>
 
 template <typename S, typename... Args>
 void LOG(const S& formatStr, Args&&... args) {
-    std::string logMsg = fmt::format(formatStr, std::forward<Args>(args)...);
-    globalCvarManager->log(logMsg);
+    globalCvarManager->log(fmt::format(formatStr, std::forward<Args>(args)...));
 }

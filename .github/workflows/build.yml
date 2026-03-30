@@ -19,6 +19,10 @@ jobs:
       - name: Clone BakkesMod SDK
         run: git clone https://github.com/bakkesmodorg/BakkesModSDK.git BakkesModSDK
 
+      - name: List SDK include structure
+        shell: powershell
+        run: Get-ChildItem -Recurse BakkesModSDK\include -Filter "*.h" | Select-Object FullName | Out-File sdk_files.txt; Get-Content sdk_files.txt
+
       - name: Build DLL
         shell: powershell
         run: msbuild FennecSwap.vcxproj /p:Configuration=Release /p:Platform=x64
