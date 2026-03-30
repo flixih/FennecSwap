@@ -5,7 +5,7 @@
 #include "bakkesmod/plugin/pluginsettingswindow.h"
 #include "bakkesmod/plugin/PluginSettingsWindow.h"
 #include "bakkesmod/wrappers/includes.h"
-#include "imgui/imgui.h"
+#include "bakkesmod/vendor/imgui/imgui.h"
 #include <memory>
 #include <string>
 
