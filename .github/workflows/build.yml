@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
@@ -24,79 +22,28 @@ jobs:
           Invoke-WebRequest -Uri "https://github.com/bakkesmodorg/BakkesModSDK/releases/latest/download/BakkesModSDK.zip" -OutFile "BakkesModSDK.zip"
           Expand-Archive -Path "BakkesModSDK.zip" -DestinationPath "BakkesModSDK"
 
-      - name: Create vcxproj
+      - name: Create project file
         shell: powershell
         run: |
-          $vcxproj = @'
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectGuid>{12345678-1234-1234-1234-123456789012}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>FennecSwap</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)x64\Release\</OutDir>
-    <IntDir>$(SolutionDir)x64\Release\obj\</IntDir>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)BakkesModSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)BakkesModSDK\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pluginsdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="FennecSwap.h" />
-    <ClInclude Include="pch.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="pch.h">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="FennecSwap.cpp" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-</Project>
-'@
-          $vcxproj | Out-File -FilePath "FennecSwap.vcxproj" -Encoding UTF8
-
-      - name: Copy SDK into project
-        shell: powershell
-        run: |
-          Copy-Item -Recurse "BakkesModSDK" "BakkesModSDK_proj"
+          $c = '<?xml version="1.0" encoding="utf-8"?><Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">'
+          $c += '<ItemGroup Label="ProjectConfigurations"><ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration></ItemGroup>'
+          $c += '<PropertyGroup Label="Globals"><ProjectGuid>{AABBCCDD-1111-2222-3333-AABBCCDDEEFF}</ProjectGuid><RootNamespace>FennecSwap</RootNamespace><WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion></PropertyGroup>'
+          $c += '<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />'
+          $c += '<PropertyGroup Condition="chr39 + $(Configuration)|$(Platform) + chr39 == chr39 + Release|x64 + chr39" Label="Configuration"><ConfigurationType>DynamicLibrary</ConfigurationType><UseDebugLibraries>false</UseDebugLibraries><PlatformToolset>v143</PlatformToolset><CharacterSet>Unicode</CharacterSet></PropertyGroup>'
+          $c += '<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />'
+          $c += '<PropertyGroup><OutDir>$(ProjectDir)x64\Release\</OutDir><IntDir>$(ProjectDir)x64\Release\obj\</IntDir></PropertyGroup>'
+          $c += '<ItemDefinitionGroup><ClCompile><PrecompiledHeader>Use</PrecompiledHeader><PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile><WarningLevel>Level3</WarningLevel><Optimization>MaxSpeed</Optimization><AdditionalIncludeDirectories>$(ProjectDir)BakkesModSDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories><PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions><LanguageStandard>stdcpp17</LanguageStandard></ClCompile>'
+          $c += '<Link><SubSystem>Windows</SubSystem><AdditionalLibraryDirectories>$(ProjectDir)BakkesModSDK\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories><AdditionalDependencies>pluginsdk.lib;%(AdditionalDependencies)</AdditionalDependencies></Link></ItemDefinitionGroup>'
+          $c += '<ItemGroup><ClInclude Include="FennecSwap.h" /><ClInclude Include="pch.h" /></ItemGroup>'
+          $c += '<ItemGroup><ClCompile Include="pch.h"><PrecompiledHeader>Create</PrecompiledHeader><PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile></ClCompile><ClCompile Include="FennecSwap.cpp" /></ItemGroup>'
+          $c += '<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" /></Project>'
+          Set-Content -Path "FennecSwap.vcxproj" -Value $c
 
       - name: Build DLL
         shell: powershell
-        run: |
-          msbuild FennecSwap.vcxproj /p:Configuration=Release /p:Platform=x64 /p:SdkDir="$(Get-Location)\BakkesModSDK"
+        run: msbuild FennecSwap.vcxproj /p:Configuration=Release /p:Platform=x64
 
-      - name: Upload DLL artifact
+      - name: Upload DLL
         uses: actions/upload-artifact@v4
         with:
           name: FennecSwap-DLL
